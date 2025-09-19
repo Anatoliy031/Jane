@@ -12,21 +12,12 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --pink: #ff6b9d;
-      --purple: #c44569;
-      --peach: #ffeaa7;
-      --mint: #74b9ff;
-      --coral: #fab1a0;
-      --gold: #fdcb6e;
-    }
-
     body {
       min-height: 100vh;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #ffc5c5 100%);
       background-size: 400% 400%;
       animation: gentleGradient 20s ease infinite;
-      font-family: 'Comfortaa', system-ui, -apple-system, sans-serif;
+      font-family: 'Comfortaa', system-ui, sans-serif;
       overflow-x: hidden;
       position: relative;
       color: #fff;
@@ -37,19 +28,18 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* Canvas для сердечек вместо салюта */
+    /* Canvas для сердечек */
     #heartsCanvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none;
+      pointer-events: auto;
       z-index: 2;
-      opacity: 0.6;
     }
 
-    /* Звезды и блестки */
+    /* Блестки */
     .sparkles {
       position: fixed;
       top: 0;
@@ -74,7 +64,7 @@
       50% { opacity: 1; transform: scale(1) rotate(180deg); }
     }
 
-    /* Летающие смайлики и сердечки */
+    /* Летающие эмодзи */
     .floating-love {
       position: fixed;
       width: 100%;
@@ -86,7 +76,7 @@
     .love-emoji {
       position: absolute;
       font-size: 24px;
-      animation: floatHeart 12s infinite;
+      animation: floatHeart 12s infinite linear;
     }
 
     @keyframes floatHeart {
@@ -119,18 +109,17 @@
       padding: 20px;
     }
 
-    /* Карточка с поздравлением */
+    /* Карточка - более прозрачная */
     .surprise-card {
       width: min(850px, 100%);
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 30px;
       padding: 40px;
       box-shadow: 
-        0 30px 60px rgba(0, 0, 0, 0.2),
-        0 0 100px rgba(255, 107, 157, 0.3),
-        inset 0 0 30px rgba(255, 255, 255, 0.1);
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 80px rgba(255, 107, 157, 0.15);
       transform: scale(0.9);
       opacity: 0;
       animation: appearCard 1s ease-out 0.5s forwards;
@@ -149,16 +138,16 @@
     .surprise-card::before {
       content: '';
       position: absolute;
-      inset: -3px;
+      inset: -2px;
       border-radius: 30px;
-      padding: 3px;
+      padding: 2px;
       background: linear-gradient(45deg, #ff6b9d, #feca57, #48dbfb, #ff9ff3, #54a0ff, #ff6b9d);
       background-size: 300% 300%;
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
       animation: rainbowBorder 4s linear infinite;
-      opacity: 0.7;
+      opacity: 0.5;
     }
 
     @keyframes rainbowBorder {
@@ -198,7 +187,7 @@
       margin-bottom: 25px;
     }
 
-    /* Фото-галерея семьи */
+    /* Семья */
     .family-gallery {
       display: flex;
       justify-content: center;
@@ -279,8 +268,8 @@
 
     /* Печатающийся текст */
     .typewriter-container {
-      background: rgba(255, 107, 157, 0.1);
-      border: 1px solid rgba(255, 107, 157, 0.3);
+      background: rgba(255, 107, 157, 0.05);
+      border: 1px solid rgba(255, 107, 157, 0.2);
       border-radius: 20px;
       padding: 20px;
       margin: 30px 0;
@@ -316,7 +305,7 @@
       51%, 100% { opacity: 0; }
     }
 
-    /* Сообщения */
+    /* Сообщения - более прозрачные */
     .messages {
       display: grid;
       gap: 20px;
@@ -324,11 +313,11 @@
     }
 
     .message-card {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
       border-radius: 20px;
       padding: 25px;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       position: relative;
       overflow: hidden;
       opacity: 0;
@@ -423,68 +412,28 @@
       box-shadow: 0 15px 40px rgba(255, 107, 157, 0.4);
     }
 
-    /* Адаптивность */
     @media (max-width: 768px) {
-      .surprise-card {
-        padding: 25px 15px;
-      }
-      
-      .main-title {
-        font-size: 2rem;
-      }
-      
-      .family-gallery {
-        gap: 15px;
-      }
-      
-      .avatar {
-        width: 100px;
-        height: 100px;
-        font-size: 2rem;
-      }
-      
-      .avatar.main {
-        width: 120px;
-        height: 120px;
-        font-size: 2.5rem;
-      }
-      
-      .typewriter-container {
-        height: 120px;
-        min-height: 120px;
-        padding: 15px;
-      }
-      
-      .typewriter {
-        font-size: 1rem;
-      }
-      
-      .message {
-        font-size: 1rem;
-      }
+      .surprise-card { padding: 25px 15px; }
+      .main-title { font-size: 2rem; }
+      .family-gallery { gap: 15px; }
+      .avatar { width: 100px; height: 100px; font-size: 2rem; }
+      .avatar.main { width: 120px; height: 120px; font-size: 2.5rem; }
+      .typewriter-container { height: 120px; min-height: 120px; padding: 15px; }
+      .typewriter { font-size: 1rem; }
+      .message { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
-  <!-- Canvas для сердечек -->
   <canvas id="heartsCanvas"></canvas>
-  
-  <!-- Блестки -->
   <div class="sparkles" id="sparkles"></div>
-  
-  <!-- Летающая любовь -->
   <div class="floating-love" id="floatingLove"></div>
 
-  <!-- Аудио для музыки -->
   <audio id="backgroundMusic" loop preload="auto">
-    <source src="./music.mp3" type="audio/mpeg">
-    <source src="./happy.mp3" type="audio/mpeg">
-    <source src="./joy.mp3" type="audio/mpeg">
-    <source src="./music.ogg" type="audio/ogg">
-    <source src="./music.m4a" type="audio/mp4">
-    <source src="./audio.mp3" type="audio/mpeg">
-    <source src="./sound.mp3" type="audio/mpeg">
-    <source src="./background.mp3" type="audio/mpeg">
+    <source src="music.mp3" type="audio/mpeg">
+    <source src="audio.mp3" type="audio/mpeg">
+    <source src="sound.mp3" type="audio/mpeg">
+    <source src="background.mp3" type="audio/mpeg">
   </audio>
 
   <div class="container">
@@ -496,22 +445,22 @@
       
       <div class="family-gallery">
         <div class="family-member">
-          <div class="avatar main" id="zhanna">Ж</div>
+          <div class="avatar main">Ж</div>
           <div class="family-name">Жануся</div>
           <div class="family-role">Супер-мама и жена</div>
         </div>
         <div class="family-member">
-          <div class="avatar husband" id="anton">А</div>
+          <div class="avatar husband">А</div>
           <div class="family-name">Антон</div>
           <div class="family-role">Любящий муж</div>
         </div>
         <div class="family-member">
-          <div class="avatar daughter1" id="mila">М</div>
+          <div class="avatar daughter1">М</div>
           <div class="family-name">Милашенька</div>
           <div class="family-role">Доченька-солнышко</div>
         </div>
         <div class="family-member">
-          <div class="avatar daughter2" id="stesha">С</div>
+          <div class="avatar daughter2">С</div>
           <div class="family-name">Стешенька</div>
           <div class="family-role">Доченька-звездочка</div>
         </div>
@@ -552,8 +501,8 @@
       <div class="signature">💖 С любовью и восхищением! 💖</div>
       
       <div class="action-buttons">
-        <button class="love-btn" onclick="launchLove()">💕 Запустить любовь!</button>
-        <button class="sound-btn" onclick="toggleSound()">🎵 Музыка</button>
+        <button class="love-btn" id="loveBtn">💕 Запустить любовь!</button>
+        <button class="sound-btn" id="soundBtn">🎵 Музыка</button>
       </div>
     </div>
   </div>
@@ -561,10 +510,8 @@
 <script>
 // Создаем блестки
 (function() {
-  const sparklesContainer = document.getElementById('sparkles');
-  const sparkleCount = 60;
-  
-  for (let i = 0; i < sparkleCount; i++) {
+  const container = document.getElementById('sparkles');
+  for (let i = 0; i < 60; i++) {
     const sparkle = document.createElement('div');
     sparkle.className = 'sparkle';
     sparkle.style.width = sparkle.style.height = (Math.random() * 3 + 1) + 'px';
@@ -572,7 +519,7 @@
     sparkle.style.top = Math.random() * 100 + '%';
     sparkle.style.animationDelay = Math.random() * 3 + 's';
     sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
-    sparklesContainer.appendChild(sparkle);
+    container.appendChild(sparkle);
   }
 })();
 
@@ -580,9 +527,8 @@
 (function() {
   const container = document.getElementById('floatingLove');
   const emojis = ['💕', '❤️', '💖', '💗', '💝', '🌸', '🌺', '🌷', '✨', '⭐', '🦋', '🌈'];
-  const count = 20;
   
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 20; i++) {
     const el = document.createElement('div');
     el.className = 'love-emoji';
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -591,39 +537,6 @@
     el.style.animationDuration = (10 + Math.random() * 5) + 's';
     container.appendChild(el);
   }
-})();
-
-// Загрузка фото для аватаров
-(function() {
-  const avatars = [
-    { id: 'zhanna', names: ['zhanna', 'жанна', 'mom', 'mama'] },
-    { id: 'anton', names: ['anton', 'антон', 'dad', 'papa'] },
-    { id: 'mila', names: ['mila', 'мила', 'милашенька', 'daughter1'] },
-    { id: 'stesha', names: ['stesha', 'стеша', 'стешенька', 'daughter2'] }
-  ];
-  
-  avatars.forEach(person => {
-    const avatar = document.getElementById(person.id);
-    const letter = avatar.textContent;
-    
-    person.names.forEach(name => {
-      ['jpg', 'jpeg', 'png', 'webp'].forEach(ext => {
-        const img = new Image();
-        img.onload = function() {
-          avatar.textContent = '';
-          img.style.cssText = `
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-          `;
-          avatar.appendChild(img);
-        };
-        img.onerror = function() {};
-        img.src = `./${name}.${ext}`;
-      });
-    });
-  });
 })();
 
 // Печатающийся текст
@@ -668,7 +581,6 @@
 const canvas = document.getElementById('heartsCanvas');
 const ctx = canvas.getContext('2d');
 let hearts = [];
-let particles = [];
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -709,7 +621,6 @@ class Heart {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     
-    // Рисуем сердечко
     const s = this.size;
     ctx.moveTo(0, -s * 0.5);
     ctx.bezierCurveTo(-s * 0.5, -s * 0.8, -s * 1.2, -s * 0.4, -s * 0.6, 0);
@@ -726,19 +637,7 @@ function createHeart(x, y) {
   const colors = ['#ff6b9d', '#ff4757', '#ff6348', '#ee5a6f', '#f8b500'];
   const color = colors[Math.floor(Math.random() * colors.length)];
   const size = Math.random() * 15 + 10;
-  
   hearts.push(new Heart(x, y, size, color));
-}
-
-function launchLove() {
-  // Запускаем множество сердечек из разных точек
-  for (let i = 0; i < 30; i++) {
-    setTimeout(() => {
-      const x = Math.random() * canvas.width;
-      const y = canvas.height - Math.random() * 100;
-      createHeart(x, y);
-    }, i * 50);
-  }
 }
 
 // Автоматический запуск сердечек
@@ -749,65 +648,81 @@ setInterval(() => {
 }, 1000);
 
 function animate() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
   hearts = hearts.filter(heart => {
     heart.update();
     heart.draw();
     return heart.opacity > 0;
   });
-
+  
   requestAnimationFrame(animate);
 }
-
 animate();
 
-// Запуск сердечек по клику
-canvas.style.pointerEvents = 'auto';
+// Запуск сердечек по клику на canvas
 canvas.addEventListener('click', (e) => {
   for (let i = 0; i < 5; i++) {
-    createHeart(e.clientX + (Math.random() - 0.5) * 20, e.clientY + (Math.random() - 0.5) * 20);
+    createHeart(
+      e.clientX + (Math.random() - 0.5) * 20,
+      e.clientY + (Math.random() - 0.5) * 20
+    );
   }
 });
 
-// Первый автоматический запуск
-setTimeout(launchLove, 1500);
-
-// Музыка
-let soundOn = false;
-const backgroundMusic = document.getElementById('backgroundMusic');
-
-// НЕ пытаемся автовоспроизвести при загрузке - это обычно блокируется браузерами
-window.addEventListener('load', () => {
-  backgroundMusic.volume = 0.3;
+// КНОПКА ЗАПУСКА ЛЮБВИ
+document.getElementById('loveBtn').addEventListener('click', function() {
+  // Запускаем множество сердечек
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const x = Math.random() * canvas.width;
+      const y = canvas.height - Math.random() * 100;
+      createHeart(x, y);
+    }, i * 50);
+  }
 });
 
-function toggleSound() {
-  const btn = document.querySelector('.sound-btn');
-  
-  if (!soundOn) {
-    // Сброс на начало для повторного воспроизведения
-    backgroundMusic.currentTime = 0;
-    
-    backgroundMusic.play().then(() => {
-      soundOn = true;
-      btn.textContent = '🔇 Выключить музыку';
-      btn.style.background = 'linear-gradient(135deg, #ff6b9d, #c44569)';
+// МУЗЫКА
+let isPlaying = false;
+const audio = document.getElementById('backgroundMusic');
+const soundBtn = document.getElementById('soundBtn');
+
+// Устанавливаем громкость
+audio.volume = 0.3;
+
+soundBtn.addEventListener('click', function() {
+  if (!isPlaying) {
+    audio.play().then(() => {
+      isPlaying = true;
+      soundBtn.textContent = '🔇 Выключить музыку';
+      soundBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c44569)';
     }).catch(error => {
       console.error('Ошибка воспроизведения:', error);
-      // Более детальная диагностика
-      if (backgroundMusic.src === '') {
-        alert('Музыкальный файл не найден. Убедитесь, что файл находится в репозитории.');
-      } else {
-        alert('Не удалось воспроизвести музыку. Возможно, браузер блокирует автовоспроизведение.');
-      }
+      alert('Не удалось воспроизвести музыку. Проверьте наличие файла music.mp3 в репозитории.');
     });
   } else {
-    backgroundMusic.pause();
-    soundOn = false;
-    btn.textContent = '🎵 Музыка';
-    btn.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
+    audio.pause();
+    isPlaying = false;
+    soundBtn.textContent = '🎵 Музыка';
+    soundBtn.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
   }
-}
+});
+
+// Следим за состоянием аудио
+audio.addEventListener('ended', () => {
+  isPlaying = false;
+  soundBtn.textContent = '🎵 Музыка';
+  soundBtn.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
+});
+
+// Первый автоматический запуск сердечек
+setTimeout(() => {
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      createHeart(Math.random() * canvas.width, canvas.height);
+    }, i * 100);
+  }
+}, 1500);
 </script>
+</body>
+</html>
