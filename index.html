@@ -96,20 +96,6 @@
     .btn:active{transform:translateY(1px)}
     .btn-fw{background:linear-gradient(135deg,#ff6b6b,#ff8787)}
     .btn-fw:hover{box-shadow:0 16px 36px rgba(255,107,107,.38);transform:translateY(-2px)}
-    .btn-music{background:linear-gradient(135deg,#4ecdc4,#44a08d)}
-    .btn-music:hover{box-shadow:0 16px 36px rgba(78,205,196,.35);transform:translateY(-2px)}
-
-    /* ===== Небольшая панель настроек ===== */
-    .panel{
-      position:fixed;right:10px;bottom:10px;z-index:4;background:rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(6px);
-      border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px
-    }
-    .panel input{
-      width:150px;max-width:42vw;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);
-      background:rgba(255,255,255,.06);color:#fff;font-size:.9rem
-    }
-    .panel small{opacity:.8}
 
     /* ===== Адаптив ===== */
     @media (max-width:768px){
@@ -117,7 +103,6 @@
       .avatar{--size:74px}
       .type{font-size:1.02rem}
       .msg{font-size:1rem}
-      .panel input{width:132px}
     }
     @media (max-width:380px){
       .avatar{--size:68px}
@@ -130,14 +115,8 @@
   <div class="stars" id="stars"></div>
   <canvas id="fireworksCanvas" aria-hidden="true"></canvas>
 
-  <!-- Музыка (по умолчанию MP.3 в корне). Можно сменить в мини-панели. -->
-  <audio id="bgm" loop preload="auto">
-    <source src="./MP.3" type="audio/mpeg">
-    <!-- Фолбэки, если переименуешь: -->
-    <source src="./music.mp3" type="audio/mpeg">
-    <source src="./music.ogg" type="audio/ogg">
-    <source src="./music.m4a" type="audio/mp4">
-  </audio>
+  <!-- Музыка: автоплей из ./music.mp3 -->
+  <audio id="bgm" src="./music.mp3" loop preload="auto"></audio>
 
   <div class="container">
     <main class="card">
@@ -185,16 +164,8 @@
 
       <div class="actions">
         <button class="btn btn-fw" id="btnFire">🎆 Пустить салют</button>
-        <button class="btn btn-music" id="btnMusic">🎵 Музыка</button>
       </div>
     </main>
-  </div>
-
-  <!-- Мини-панель: быстро сменить трек без правки кода -->
-  <div class="panel" title="Укажи имя файла музыки, лежащего в корне (например, MP.3)">
-    <small>Трек:</small>
-    <input id="musicName" placeholder="MP.3" value="MP.3" />
-    <button class="btn btn-music" id="applyMusic" style="padding:8px 14px;font-size:.9rem">OK</button>
   </div>
 
 <script>
@@ -305,7 +276,6 @@ class Particle{
     this.o=1;this.d=0.012+Math.random()*0.018;this.g=0.06;this.f=Math.random()*.002+.001
   }
   update(){
-    // лёгкое «дутьё» ветра
     this.vx+= (Math.random()-.5)*0.02;
     this.x+=this.vx; this.y+=this.vy; this.vy+=this.g; this.vx*=0.995;
     this.o-=this.d; this.s*=0.997
@@ -327,8 +297,7 @@ class Firework{
   update(i){
     this.trail.push({x:this.x,y:this.y}); if(this.trail.length>this.len) this.trail.shift();
     this.speed*=this.acc; const vx=Math.cos(this.angle)*this.speed, vy=Math.sin(this.angle)*this.speed;
-    this.traveled=Math.hypot(this.x+vx-this.tx, this.y+vy-this.ty);
-    if(this.traveled<=2 || Math.hypot(this.x-this.tx,this.y-this.ty)<18){
+    if(Math.hypot(this.x+vx-this.tx,this.y+vy-this.ty)<18){
       explode(this.tx,this.ty,this.h); fireworks.splice(i,1); return;
     }
     this.x+=vx; this.y+=vy;
@@ -344,25 +313,18 @@ class Firework{
 }
 
 function explode(x,y,h){
-  // разные типы разрывов
   const kind = Math.random();
-  const n = 90 + (Math.random()*50)|0;
+  const n = 90 + (Math.random()*50|0);
   const base = Math.random()*2.5+1.8;
   for(let i=0;i<n;i++){
     const a = (Math.PI*2/n)*i + (Math.random()*0.1);
     const sp = base + Math.random()*2.5;
     let vx = Math.cos(a)*sp, vy=Math.sin(a)*sp;
-    if(kind<.3){ // кольцо
-      vy*=0.8;
-    } else if(kind<.6){ // хризантема
-      vx*= (0.7+Math.random()*0.6); vy*= (0.7+Math.random()*0.6);
-    } else { // пальма
-      vy*=1.2; if(i%7===0) vy*=1.6;
-    }
+    if(kind<.3){ vy*=0.8; } else if(kind<.6){ vx*=(0.7+Math.random()*0.6); vy*=(0.7+Math.random()*0.6); }
+    else { vy*=1.2; if(i%7===0) vy*=1.6; }
     const color=`hsl(${h+ (Math.random()*50-25)},100%,${50+Math.random()*18}%)`;
     particles.push(new Particle(x,y,color,vx,vy,1.2+Math.random()*2.2));
   }
-  // центральная вспышка
   for(let i=0;i<22;i++){
     const a=Math.random()*Math.PI*2, sp=Math.random()*2.2;
     particles.push(new Particle(x,y,'#ffffff',Math.cos(a)*sp,Math.sin(a)*sp,1+Math.random()*1.6));
@@ -371,7 +333,6 @@ function explode(x,y,h){
 }
 
 function animate(){
-  // делаем выше/чище: прозрачная «затирающая» вуаль
   ctx.fillStyle='rgba(0,0,0,.12)'; ctx.fillRect(0,0,canvas.width,canvas.height);
   for(let i=fireworks.length-1;i>=0;i--){fireworks[i].draw(); fireworks[i].update(i)}
   for(let j=particles.length-1;j>=0;j--){
@@ -381,13 +342,13 @@ function animate(){
 }
 animate();
 
-// автосалют (разные уровни — выше центра)
+// автосалют (выше центра)
 setInterval(()=>{
   if(Math.random()<0.055){
     const sx = Math.random()*canvas.width;
     const sy = canvas.height;
     const tx = Math.random()*canvas.width;
-    const ty = Math.random()*canvas.height*0.42 + 40; // выше
+    const ty = Math.random()*canvas.height*0.42 + 40;
     fireworks.push(new Firework(sx,sy,tx,ty));
   }
 }, 1000);
@@ -398,27 +359,36 @@ canvas.addEventListener('click',e=>{
   fireworks.push(new Firework(Math.random()*canvas.width, canvas.height, tx, ty));
 });
 
-/* =================== МУЗЫКА =================== */
-let musicOn=false;
+/* =================== МУЗЫКА — автозапуск с надёжным фолбэком =================== */
 const bgm=document.getElementById('bgm');
-const btnMusic=document.getElementById('btnMusic');
-bgm.volume=0.32;
-addEventListener('load',()=>{ bgm.play().then(()=>{musicOn=true;btnMusic.textContent='🔇 Выключить';}).catch(()=>{}) });
-btnMusic.addEventListener('click',()=>{
-  if(!musicOn){ bgm.play().then(()=>{musicOn=true;btnMusic.textContent='🔇 Выключить';btnMusic.classList.add('btn-fw');}); }
-  else { bgm.pause(); musicOn=false; btnMusic.textContent='🎵 Музыка'; btnMusic.classList.remove('btn-fw'); }
-});
+bgm.volume=0.0; // мягкий fade-in
+let musicStarted=false;
 
-// мини-панель смены файла (лежит в корне)
-document.getElementById('applyMusic').addEventListener('click',()=>{
-  const name = document.getElementById('musicName').value.trim();
-  if(!name) return;
-  const wasPlaying = !bgm.paused;
-  bgm.pause(); musicOn=false;
-  bgm.src = './'+name; // достаточно указать новый файл в корне
-  bgm.load();
-  bgm.play().then(()=>{musicOn=true;btnMusic.textContent='🔇 Выключить';}).catch(()=>{alert('Не удалось воспроизвести. Проверь файл в корне репозитория.');});
-});
+function fadeIn(target=0.32, step=0.02, interval=120){
+  const t=setInterval(()=>{
+    bgm.volume=Math.min(target, bgm.volume+step);
+    if(bgm.volume>=target) clearInterval(t);
+  }, interval);
+}
+
+async function startMusic(){
+  if(musicStarted) return;
+  try{
+    await bgm.play();
+    musicStarted=true; fadeIn();
+  }catch(e){
+    // если автоплей заблокирован — играем при первом взаимодействии
+    const kick = async ()=>{
+      try{ await bgm.play(); musicStarted=true; fadeIn(); cleanup(); }catch(_){} 
+    };
+    const cleanup = ()=>{
+      ['pointerdown','keydown','touchstart','visibilitychange'].forEach(ev=>document.removeEventListener(ev,kick,{passive:true}));
+    };
+    ['pointerdown','keydown','touchstart','visibilitychange'].forEach(ev=>document.addEventListener(ev,kick,{passive:true,once:true}));
+  }
+}
+
+window.addEventListener('load', startMusic);
 
 /* =================== КНОПКА САЛЮТА =================== */
 document.getElementById('btnFire').addEventListener('click',()=>{
@@ -430,7 +400,8 @@ document.getElementById('btnFire').addEventListener('click',()=>{
       fireworks.push(new Firework(sx,sy,tx,ty));
     }, i*180);
   }
-  vib([40,30,40]); boomSound();
+  boomSound(); // хлопок старта
+  if(navigator.vibrate) navigator.vibrate([40,30,40]);
 });
 
 /* =================== ИНИЦ: автозапуск первой серии =================== */
