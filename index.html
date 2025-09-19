@@ -28,7 +28,7 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* Canvas для сердечек */
+    /* Canvas для сердечек и других фигур */
     #heartsCanvas {
       position: fixed;
       top: 0;
@@ -226,6 +226,9 @@
       position: relative;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       animation: float 3s ease-in-out infinite;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
     }
 
     .avatar.main {
@@ -247,6 +250,22 @@
     .avatar.daughter2 {
       background: linear-gradient(135deg, #fd79a8, #fdcb6e);
       animation-delay: 1s;
+    }
+
+    /* Если есть фото, убираем градиент */
+    .avatar.has-photo {
+      background: none;
+    }
+
+    .avatar-letter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-size: inherit;
+      font-weight: 800;
+      color: white;
     }
 
     @keyframes float {
@@ -395,6 +414,8 @@
       cursor: pointer;
       transition: all 0.3s ease;
       font-family: 'Comfortaa', sans-serif;
+      position: relative;
+      overflow: hidden;
     }
 
     .love-btn {
@@ -402,9 +423,22 @@
       box-shadow: 0 10px 30px rgba(255, 107, 157, 0.3);
     }
 
+    .love-btn.active {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
     .sound-btn {
       background: linear-gradient(135deg, #74b9ff, #0984e3);
       box-shadow: 0 10px 30px rgba(116, 185, 255, 0.3);
+    }
+
+    .sound-btn.playing {
+      background: linear-gradient(135deg, #ff6b9d, #c44569);
     }
 
     .love-btn:hover, .sound-btn:hover {
@@ -429,11 +463,13 @@
   <div class="sparkles" id="sparkles"></div>
   <div class="floating-love" id="floatingLove"></div>
 
+  <!-- Аудио элемент для музыки -->
   <audio id="backgroundMusic" loop preload="auto">
+    <!-- Вы можете заменить music.mp3 на любое другое имя файла -->
     <source src="music.mp3" type="audio/mpeg">
-    <source src="audio.mp3" type="audio/mpeg">
-    <source src="sound.mp3" type="audio/mpeg">
+    <!-- Запасные варианты имен файлов -->
     <source src="background.mp3" type="audio/mpeg">
+    <source src="audio.mp3" type="audio/mpeg">
   </audio>
 
   <div class="container">
@@ -445,22 +481,30 @@
       
       <div class="family-gallery">
         <div class="family-member">
-          <div class="avatar main">Ж</div>
+          <div class="avatar main" id="jane-avatar">
+            <div class="avatar-letter">Ж</div>
+          </div>
           <div class="family-name">Жануся</div>
           <div class="family-role">Супер-мама и жена</div>
         </div>
         <div class="family-member">
-          <div class="avatar husband">А</div>
+          <div class="avatar husband" id="anton-avatar">
+            <div class="avatar-letter">А</div>
+          </div>
           <div class="family-name">Антон</div>
           <div class="family-role">Любящий муж</div>
         </div>
         <div class="family-member">
-          <div class="avatar daughter1">М</div>
+          <div class="avatar daughter1" id="mimi-avatar">
+            <div class="avatar-letter">М</div>
+          </div>
           <div class="family-name">Милашенька</div>
           <div class="family-role">Доченька-солнышко</div>
         </div>
         <div class="family-member">
-          <div class="avatar daughter2">С</div>
+          <div class="avatar daughter2" id="stef-avatar">
+            <div class="avatar-letter">С</div>
+          </div>
           <div class="family-name">Стешенька</div>
           <div class="family-role">Доченька-звездочка</div>
         </div>
@@ -502,12 +546,54 @@
       
       <div class="action-buttons">
         <button class="love-btn" id="loveBtn">💕 Запустить любовь!</button>
-        <button class="sound-btn" id="soundBtn">🎵 Музыка</button>
+        <button class="sound-btn" id="soundBtn">🎵 Включить музыку</button>
       </div>
     </div>
   </div>
 
 <script>
+// Загрузка фотографий в аватары
+function loadPhotos() {
+  const photos = [
+    { id: 'jane-avatar', src: 'Jane.jpg', fallbacks: ['Jane.png', 'Jane.jpeg'] },
+    { id: 'anton-avatar', src: 'Anton.jpg', fallbacks: ['Anton.png', 'Anton.jpeg'] },
+    { id: 'mimi-avatar', src: 'Mimi.jpg', fallbacks: ['Mimi.png', 'Mimi.jpeg'] },
+    { id: 'stef-avatar', src: 'Stef.jpg', fallbacks: ['Stef.png', 'Stef.jpeg'] }
+  ];
+
+  photos.forEach(photo => {
+    const avatar = document.getElementById(photo.id);
+    if (avatar) {
+      const img = new Image();
+      let currentIndex = 0;
+      const sources = [photo.src, ...photo.fallbacks];
+      
+      function tryNextSource() {
+        if (currentIndex < sources.length) {
+          img.src = sources[currentIndex];
+          currentIndex++;
+        }
+      }
+      
+      img.onload = function() {
+        avatar.style.backgroundImage = `url(${img.src})`;
+        avatar.classList.add('has-photo');
+        const letter = avatar.querySelector('.avatar-letter');
+        if (letter) letter.style.display = 'none';
+      };
+      
+      img.onerror = function() {
+        tryNextSource();
+      };
+      
+      tryNextSource();
+    }
+  });
+}
+
+// Вызываем загрузку фото при загрузке страницы
+window.addEventListener('load', loadPhotos);
+
 // Создаем блестки
 (function() {
   const container = document.getElementById('sparkles');
@@ -577,10 +663,11 @@
   runPhrases();
 })();
 
-// АНИМАЦИЯ СЕРДЕЧЕК
+// АНИМАЦИЯ СЕРДЕЧЕК И ДРУГИХ ФИГУР
 const canvas = document.getElementById('heartsCanvas');
 const ctx = canvas.getContext('2d');
 let hearts = [];
+let loveMode = false;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -590,25 +677,27 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
 class Heart {
-  constructor(x, y, size, color) {
+  constructor(x, y, size, color, shape = 'heart') {
     this.x = x;
     this.y = y;
     this.size = size;
     this.color = color;
+    this.shape = shape;
     this.velocity = {
-      x: (Math.random() - 0.5) * 2,
-      y: -Math.random() * 3 - 1
+      x: (Math.random() - 0.5) * 3,
+      y: -Math.random() * 4 - 2
     };
     this.opacity = 1;
-    this.decay = Math.random() * 0.01 + 0.005;
+    this.decay = Math.random() * 0.01 + 0.008;
     this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+    this.rotationSpeed = (Math.random() - 0.5) * 0.15;
   }
 
   update() {
     this.x += this.velocity.x;
     this.y += this.velocity.y;
-    this.velocity.y += 0.05;
+    this.velocity.y += 0.08;
+    this.velocity.x *= 0.99;
     this.opacity -= this.decay;
     this.rotation += this.rotationSpeed;
   }
@@ -619,110 +708,68 @@ class Heart {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation);
     ctx.fillStyle = this.color;
-    ctx.beginPath();
     
-    const s = this.size;
-    ctx.moveTo(0, -s * 0.5);
-    ctx.bezierCurveTo(-s * 0.5, -s * 0.8, -s * 1.2, -s * 0.4, -s * 0.6, 0);
-    ctx.bezierCurveTo(-s * 0.3, s * 0.3, 0, s * 0.5, 0, s * 0.8);
-    ctx.bezierCurveTo(0, s * 0.5, s * 0.3, s * 0.3, s * 0.6, 0);
-    ctx.bezierCurveTo(s * 1.2, -s * 0.4, s * 0.5, -s * 0.8, 0, -s * 0.5);
+    if (this.shape === 'heart') {
+      ctx.beginPath();
+      const s = this.size;
+      ctx.moveTo(0, -s * 0.5);
+      ctx.bezierCurveTo(-s * 0.5, -s * 0.8, -s * 1.2, -s * 0.4, -s * 0.6, 0);
+      ctx.bezierCurveTo(-s * 0.3, s * 0.3, 0, s * 0.5, 0, s * 0.8);
+      ctx.bezierCurveTo(0, s * 0.5, s * 0.3, s * 0.3, s * 0.6, 0);
+      ctx.bezierCurveTo(s * 1.2, -s * 0.4, s * 0.5, -s * 0.8, 0, -s * 0.5);
+      ctx.fill();
+    } else if (this.shape === 'star') {
+      ctx.beginPath();
+      const s = this.size;
+      for (let i = 0; i < 5; i++) {
+        const angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+        const x = Math.cos(angle) * s;
+        const y = Math.sin(angle) * s;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+        
+        const innerAngle = angle + Math.PI / 5;
+        const innerX = Math.cos(innerAngle) * (s * 0.5);
+        const innerY = Math.sin(innerAngle) * (s * 0.5);
+        ctx.lineTo(innerX, innerY);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else if (this.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
     
-    ctx.fill();
     ctx.restore();
   }
 }
 
-function createHeart(x, y) {
-  const colors = ['#ff6b9d', '#ff4757', '#ff6348', '#ee5a6f', '#f8b500'];
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  const size = Math.random() * 15 + 10;
-  hearts.push(new Heart(x, y, size, color));
-}
-
-// Автоматический запуск сердечек
-setInterval(() => {
-  if (Math.random() < 0.1) {
-    createHeart(Math.random() * canvas.width, canvas.height);
-  }
-}, 1000);
-
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function createHeart(x, y, burst = false) {
+  const colors = ['#ff6b9d', '#ff4757', '#ff6348', '#ee5a6f', '#f8b500', '#ff9ff3', '#48dbfb'];
+  const shapes = loveMode ? ['heart', 'star', 'circle'] : ['heart'];
   
-  hearts = hearts.filter(heart => {
-    heart.update();
-    heart.draw();
-    return heart.opacity > 0;
-  });
-  
-  requestAnimationFrame(animate);
-}
-animate();
-
-// Запуск сердечек по клику на canvas
-canvas.addEventListener('click', (e) => {
-  for (let i = 0; i < 5; i++) {
-    createHeart(
-      e.clientX + (Math.random() - 0.5) * 20,
-      e.clientY + (Math.random() - 0.5) * 20
-    );
-  }
-});
-
-// КНОПКА ЗАПУСКА ЛЮБВИ
-document.getElementById('loveBtn').addEventListener('click', function() {
-  // Запускаем множество сердечек
-  for (let i = 0; i < 30; i++) {
-    setTimeout(() => {
-      const x = Math.random() * canvas.width;
-      const y = canvas.height - Math.random() * 100;
-      createHeart(x, y);
-    }, i * 50);
-  }
-});
-
-// МУЗЫКА
-let isPlaying = false;
-const audio = document.getElementById('backgroundMusic');
-const soundBtn = document.getElementById('soundBtn');
-
-// Устанавливаем громкость
-audio.volume = 0.3;
-
-soundBtn.addEventListener('click', function() {
-  if (!isPlaying) {
-    audio.play().then(() => {
-      isPlaying = true;
-      soundBtn.textContent = '🔇 Выключить музыку';
-      soundBtn.style.background = 'linear-gradient(135deg, #ff6b9d, #c44569)';
-    }).catch(error => {
-      console.error('Ошибка воспроизведения:', error);
-      alert('Не удалось воспроизвести музыку. Проверьте наличие файла music.mp3 в репозитории.');
-    });
+  if (burst) {
+    // Создаем взрыв из частиц
+    for (let i = 0; i < 8; i++) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const size = Math.random() * 20 + 10;
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
+      const heart = new Heart(x, y, size, color, shape);
+      heart.velocity.x = (Math.random() - 0.5) * 8;
+      heart.velocity.y = (Math.random() - 0.5) * 8 - 2;
+      hearts.push(heart);
+    }
   } else {
-    audio.pause();
-    isPlaying = false;
-    soundBtn.textContent = '🎵 Музыка';
-    soundBtn.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const size = Math.random() * 15 + 10;
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    hearts.push(new Heart(x, y, size, color, shape));
   }
-});
-
-// Следим за состоянием аудио
-audio.addEventListener('ended', () => {
-  isPlaying = false;
-  soundBtn.textContent = '🎵 Музыка';
-  soundBtn.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3)';
-});
-
-// Первый автоматический запуск сердечек
-setTimeout(() => {
-  for (let i = 0; i < 20; i++) {
-    setTimeout(() => {
-      createHeart(Math.random() * canvas.width, canvas.height);
-    }, i * 100);
+}
+  } else {
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const size = Math.random() * 15 + 10;
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    hearts.push(new Heart(x, y, size, color, shape));
   }
-}, 1500);
-</script>
-</body>
-</html>
